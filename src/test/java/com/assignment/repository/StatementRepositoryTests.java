@@ -14,7 +14,7 @@ import com.assignment.domain.Statement;
 import com.assignment.domain.enums.AccountType;
 
 @DataJpaTest
-public class StatementRepositoryTests {
+class StatementRepositoryTests {
 	
 	@Autowired
 	private StatementRepository statementRepository;
@@ -41,10 +41,9 @@ public class StatementRepositoryTests {
 	}
 	
 	@Test
-	public void givenStatements_whenFindAll_thenStatementList() {
+	void givenStatements_whenFindAll_thenStatementList() {
 		List<Statement> statementList = statementRepository.findAll();
-		assertThat(statementList).isNotNull();
-		assertThat(statementList.size()).isEqualTo(1);
+		assertThat(statementList).hasSize(1);
 	}
 
 }
