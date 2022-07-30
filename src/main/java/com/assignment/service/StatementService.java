@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -36,11 +37,30 @@ public class StatementService {
 		this.statementRepository = statementRepository;
 	}
 
-	public List<StatementDto> searchByDateAmountRange(StatementSearchDto statementSearchDto) {
+	public List<StatementDto> searchStatements(Long accountId, StatementSearchDto statementSearchDto) {
 		log.debug("Statement search started with data {}", statementSearchDto);
+		List<StatementDto> statementDtos;
+		if (statementSearchDto == null) {
+			statementDtos = getLastThreeMonthStatements(accountId);
+		} else {
+			statementDtos = searchByDateAmountRange(accountId, statementSearchDto);
+		}
+		log.debug("Statement search completed with result {}", statementDtos);
+		return statementDtos;
+	}
+
+	private List<StatementDto> getLastThreeMonthStatements(Long accountId) {
+		LocalDate today = LocalDate.now();
+		LocalDate fromDate = today.minusMonths(3).withDayOfMonth(1);
 		List<Statement> statements = statementRepository.findAll();
-		return statements.stream()
-				.filter(s -> s.getAccount().getId() == statementSearchDto.getAccountId())
+		return statements.stream().filter(s -> Objects.equals(s.getAccount().getId(), accountId))
+				.filter(fromDate != null ? filterByDateBetween(fromDate, today) : s -> true).map(StatementDto::new)
+				.collect(Collectors.toList());
+	}
+
+	private List<StatementDto> searchByDateAmountRange(Long accountId, StatementSearchDto statementSearchDto) {
+		List<Statement> statements = statementRepository.findAll();
+		return statements.stream().filter(s -> Objects.equals(s.getAccount().getId(), accountId))
 				.filter(statementSearchDto.getFromAmount() != null
 						? filterByAmountBetween(statementSearchDto.getFromAmount(), statementSearchDto.getToAmount())
 						: s -> true)
@@ -53,14 +73,16 @@ public class StatementService {
 	private Predicate<Statement> filterByDateBetween(LocalDate fromDate, LocalDate toDate) {
 		return statement -> {
 			LocalDate date = convertToDate(statement.getDate());
-			return (date.isEqual(fromDate) || date.isAfter(fromDate)) && (date.isEqual(toDate) || date.isBefore(toDate));
+			return (date.isEqual(fromDate) || date.isAfter(fromDate))
+					&& (date.isEqual(toDate) || date.isBefore(toDate));
 		};
 	}
 
 	private Predicate<Statement> filterByAmountBetween(BigDecimal fromAmount, BigDecimal toAmount) {
 		return statement -> {
 			BigDecimal amount = new BigDecimal(statement.getAmount());
-			return (amount.equals(fromAmount) || amount.compareTo(fromAmount) > 0) && (amount.equals(toAmount) || amount.compareTo(toAmount) < 0);
+			return (amount.equals(fromAmount) || amount.compareTo(fromAmount) > 0)
+					&& (amount.equals(toAmount) || amount.compareTo(toAmount) < 0);
 		};
 	}
 

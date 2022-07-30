@@ -24,6 +24,8 @@ import com.assignment.repository.StatementRepository;
 
 @ExtendWith(MockitoExtension.class)
 class StatementServiceTests {
+	
+	private static final Long ACCOUNT_ID = 4L;
 
 	@InjectMocks
 	private StatementService statementService;
@@ -38,7 +40,7 @@ class StatementServiceTests {
 	@BeforeEach
 	public void setUp() {
 		Account account = new Account();
-		account.setId(4L);
+		account.setId(ACCOUNT_ID);
 		account.setAccountType(AccountType.CURRENT);
 		account.setAccountNumber("0012250016004");
 
@@ -77,10 +79,16 @@ class StatementServiceTests {
 		statement.setAccount(account);
 		statements.add(statement);
 		
+		statement = new Statement();
+		statement.setId(6L);
+		statement.setDate("05.07.2022");
+		statement.setAmount("501.921910891848");
+		statement.setAccount(account);
+		statements.add(statement);
+		
 		statementSearchDto = new StatementSearchDto();
-		statementSearchDto.setAccountId(4L);
-		statementSearchDto.setFromDate(LocalDate.of(2018, 07, 04));
-		statementSearchDto.setToDate(LocalDate.of(2020, 11, 16));
+		statementSearchDto.setFromDate(LocalDate.of(2018, 07, 05));
+		statementSearchDto.setToDate(LocalDate.of(2020, 11, 15));
 		statementSearchDto.setFromAmount(new BigDecimal("257.292396032404"));
 		statementSearchDto.setToAmount(new BigDecimal("966.410308637791"));
 	}
@@ -88,15 +96,14 @@ class StatementServiceTests {
 	@Test
 	void givenAllSearchParameters_whenStatementSearch_thenReturnStatementList() {
 		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchByDateAmountRange(statementSearchDto);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
 		assertThat(statementDtos).hasSize(3);
 	}
 
 	@Test
 	void givenAllSearchParametersWithNonExistAccountId_whenStatementSearch_thenReturnEmptyStatementList() {
-		statementSearchDto.setAccountId(6L);
 		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchByDateAmountRange(statementSearchDto);
+		List<StatementDto> statementDtos = statementService.searchStatements(6L, statementSearchDto);
 		assertThat(statementDtos).isEmpty();
 	}
 	
@@ -105,7 +112,7 @@ class StatementServiceTests {
 		statementSearchDto.setFromAmount(null);
 		statementSearchDto.setToAmount(null);
 		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchByDateAmountRange(statementSearchDto);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
 		assertThat(statementDtos).hasSize(5);
 	}
 	
@@ -114,8 +121,16 @@ class StatementServiceTests {
 		statementSearchDto.setFromDate(null);
 		statementSearchDto.setToDate(null);
 		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchByDateAmountRange(statementSearchDto);
-		assertThat(statementDtos).hasSize(3);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
+		assertThat(statementDtos).hasSize(4);
+	}
+	
+	@Test
+	void givenAccountIdWithoutSearchParameter_whenStatementSearch_thenReturnLastThreeMonthStatementList() {
+		statementSearchDto = null;
+		given(statementRepository.findAll()).willReturn(statements);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
+		assertThat(statementDtos).hasSize(1);
 	}
 	
 //	@Test
