@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.assignment.api.v1.rest.validator.StatementSearchValidator;
 import com.assignment.dto.StatementDto;
 import com.assignment.security.AuthoritiesConstants;
 import com.assignment.service.StatementService;
@@ -42,6 +43,8 @@ public class StatementController {
 			@RequestParam(value = "toDate") final String toDate) {
 		log.debug("REST request to search statements : accountId: {}, formDate: {}, toDate: {}", accountId, fromDate,
 				toDate);
+		StatementSearchValidator validator = new StatementSearchValidator();
+		validator.validateDates(fromDate, toDate);
 		return statementService.searchStatements(accountId, DateUtil.convertToDate(fromDate), DateUtil.convertToDate(toDate));
 	}
 
@@ -52,6 +55,8 @@ public class StatementController {
 			@RequestParam(value = "toAmount") final BigDecimal toAmount) {
 		log.debug("REST request to search statements : accountId: {}, fromAmount: {}, toAmount: {}", accountId,
 				fromAmount, toAmount);
+		StatementSearchValidator validator = new StatementSearchValidator();
+		validator.validateAmounts(fromAmount, toAmount);
 		return statementService.searchStatements(accountId, fromAmount, toAmount);
 	}
 

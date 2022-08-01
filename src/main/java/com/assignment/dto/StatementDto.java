@@ -1,5 +1,7 @@
 package com.assignment.dto;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.assignment.domain.Statement;
 import com.assignment.util.DateUtil;
 
@@ -31,10 +33,17 @@ public class StatementDto {
 	}
 
 	public StatementDto(Statement statement) {
-		this.accountNumber = statement.getAccount().getAccountNumber();
+		this.accountNumber = maskNumber(statement.getAccount().getAccountNumber());
 		this.accountType = statement.getAccount().getAccountType();
 		this.date = statement.getDate().format(DateUtil.DATE_FORMATTER);
 		this.amount = statement.getAmount().toString();
+	}
+	
+	private String maskNumber(final String accNum) {
+		final int start = 0;
+	    final int end = accNum.length() - 2;
+	    final String overlay = StringUtils.repeat("X", end - start);
+	    return StringUtils.overlay(accNum, overlay, start, end);
 	}
 
 	public String getAccountNumber() {

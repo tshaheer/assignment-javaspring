@@ -19,16 +19,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.assignment.domain.Account;
 import com.assignment.dto.StatementDto;
+import com.assignment.security.AuthoritiesConstants;
 import com.assignment.service.StatementService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 class StatementControllerIT {
 
 	private static final Long ACCOUNT_ID = 4L;
@@ -41,9 +44,6 @@ class StatementControllerIT {
 
 	@MockBean
 	private StatementService statementService;
-
-//	@Autowired
-//	private ObjectMapper objectMapper;
 
 	private List<StatementDto> statements = new ArrayList<>();
 
@@ -67,6 +67,7 @@ class StatementControllerIT {
 		statements.add(statement);
 	}
 
+	// Date
 	@Test
 	void givenAccountIdAndDateRange_whenSearchStatements_thenReturnStatementDtoList() throws Exception {
 		given(statementService.searchStatements(ACCOUNT_ID, LocalDate.of(2018, 07, 05), LocalDate.of(2020, 11, 15)))
@@ -79,6 +80,52 @@ class StatementControllerIT {
 	}
 
 	@Test
+	void givenAccountIdAndInvalidFromDateFormat_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, LocalDate.of(2018, 07, 05), LocalDate.of(2020, 11, 15)))
+				.willReturn(statements);
+		ResultActions response = mockMvc
+				.perform(get(API_URL_STATEMENTS + "/{accountId}?fromDate=05-07-2018&toDate=15.11.2020", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void givenAccountIdAndInvalidToDateFormat_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, LocalDate.of(2018, 07, 05), LocalDate.of(2020, 11, 15)))
+				.willReturn(statements);
+		ResultActions response = mockMvc
+				.perform(get(API_URL_STATEMENTS + "/{accountId}?fromDate=05.07.2018&toDate=15-11-2020", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void givenAccountIdAndFromDateAfterToday_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, LocalDate.of(4025, 07, 05), LocalDate.of(2020, 11, 15)))
+				.willReturn(statements);
+		ResultActions response = mockMvc
+				.perform(get(API_URL_STATEMENTS + "/{accountId}?fromDate=05.07.4020&toDate=15.11.2020", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void givenAccountIdAndToDateAfterToday_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, LocalDate.of(2018, 07, 05), LocalDate.of(4025, 11, 15)))
+				.willReturn(statements);
+		ResultActions response = mockMvc
+				.perform(get(API_URL_STATEMENTS + "/{accountId}?fromDate=05.07.2018&toDate=15.11.4020", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void givenAccountIdAndToDateAfterToDate_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, LocalDate.of(2018, 07, 05), LocalDate.of(2020, 11, 15)))
+				.willReturn(statements);
+		ResultActions response = mockMvc
+				.perform(get(API_URL_STATEMENTS + "/{accountId}?fromDate=16.11.2020&toDate=15.11.2020", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+
+	// Amount
+	@Test
 	void givenAccountIdAndAmountRange_whenSearchStatements_thenReturnStatementDtoList() throws Exception {
 		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
 				.willReturn(statements);
@@ -90,6 +137,52 @@ class StatementControllerIT {
 	}
 
 	@Test
+	void givenAccountIdAndInvalidFromAmount_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
+				.willReturn(statements);
+		ResultActions response = mockMvc.perform(get(
+				API_URL_STATEMENTS + "/{accountId}?fromAmount=abc&toAmount=" + TO_AMOUNT, ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	void givenAccountIdAndInvalidToAmount_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
+				.willReturn(statements);
+		ResultActions response = mockMvc.perform(get(
+				API_URL_STATEMENTS + "/{accountId}?fromAmount="+ FROM_AMOUNT +"&toAmount=xyz", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	void givenAccountIdAndFromAmountLessThanZero_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
+				.willReturn(statements);
+		ResultActions response = mockMvc.perform(get(
+				API_URL_STATEMENTS + "/{accountId}?fromAmount=-1&toAmount=12", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void givenAccountIdAndToAmountZero_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
+				.willReturn(statements);
+		ResultActions response = mockMvc.perform(get(
+				API_URL_STATEMENTS + "/{accountId}?fromAmount=1&toAmount=0", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	void givenAccountIdAndFromAmountGreaterThanToAmount_whenSearchStatements_thenReturnBadRequest() throws Exception {
+		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
+				.willReturn(statements);
+		ResultActions response = mockMvc.perform(get(
+				API_URL_STATEMENTS + "/{accountId}?fromAmount=12&toAmount=10", ACCOUNT_ID));
+		response.andExpect(status().isBadRequest());
+	}
+
+	// only accountId
+	@Test
 	void givenAccountId_whenSearchStatements_thenReturnLastThreeMonthsStatementDtoList() throws Exception {
 		given(statementService.searchStatements(ACCOUNT_ID)).willReturn(statements);
 		ResultActions response = mockMvc.perform(get(API_URL_STATEMENTS + "/{accountId}", ACCOUNT_ID));
@@ -97,4 +190,6 @@ class StatementControllerIT {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(jsonPath("$.size()", CoreMatchers.is(statements.size())));
 	}
+	
+	
 }
