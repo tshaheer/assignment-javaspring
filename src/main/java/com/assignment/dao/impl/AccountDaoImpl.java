@@ -19,7 +19,7 @@ public class AccountDaoImpl implements AccountDao {
 	@Override
 	public Account findById(Long id) {
 		String sql = "SELECT * FROM ACCOUNT WHERE ID = ?";
-		return jdbcTemplate.queryForObject(sql, new AccountRowMapper(), id);
+		return jdbcTemplate.query(sql, new AccountRowMapper(), id);
 	}
 
 }

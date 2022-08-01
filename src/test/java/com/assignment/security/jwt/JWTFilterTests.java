@@ -1,12 +1,12 @@
 package com.assignment.security.jwt;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -16,6 +16,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.assignment.dao.UserDao;
+import com.assignment.dao.impl.UserDaoImpl;
 import com.assignment.security.AuthoritiesConstants;
 
 import io.jsonwebtoken.io.Decoders;
@@ -30,7 +32,8 @@ class JWTFilterTests {
     @BeforeEach
     public void setup() {
         String base64Secret = "bXktc2VjcmV0LWtleS13aGljaC1zaG91bGQtYmUtY2hhbmdlZC1pbi1wcm9kdWN0aW9uLWFuZC1iZS1iYXNlNjQtZW5jb2RlZAo=";
-        tokenProvider = new TokenProvider();
+        UserDao userDao = Mockito.mock(UserDaoImpl.class);
+        tokenProvider = new TokenProvider(userDao);
         ReflectionTestUtils.setField(tokenProvider, "key", Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Secret)));
         ReflectionTestUtils.setField(tokenProvider, "tokenValidityInMilliseconds", 60000);
         jwtFilter = new JWTFilter(tokenProvider);

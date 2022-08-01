@@ -42,13 +42,18 @@ public class UserJWTController {
 	public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginDto loginDto) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 				loginDto.getUsername(), loginDto.getPassword());
-
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = tokenProvider.createToken(authentication);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 		return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity<String> logout() {
+		this.tokenProvider.removeSession();
+		return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
 	}
 
 	/**

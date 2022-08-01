@@ -9,12 +9,15 @@ import java.util.Date;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.assignment.dao.UserDao;
+import com.assignment.dao.impl.UserDaoImpl;
 import com.assignment.security.AuthoritiesConstants;
 
 import io.jsonwebtoken.Jwts;
@@ -32,8 +35,8 @@ class TokenProviderTests {
     @BeforeEach
     public void setup() {
         String base64Secret = "fd54a45s65fds737b9aafcb3412e07ed99b267f33413274720ddbb7f6c5e64e9f14075f2d7ed041592f0b7657baf8";
-
-        tokenProvider = new TokenProvider();
+        UserDao userDao = Mockito.mock(UserDaoImpl.class);
+        tokenProvider = new TokenProvider(userDao);
         key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Secret));
 
         ReflectionTestUtils.setField(tokenProvider, "key", key);

@@ -1,5 +1,6 @@
 package com.assignment.security;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,9 +12,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.assignment.dao.UserDao;
+import com.assignment.domain.User;
 
 /**
  * Authenticate a user from the database.
@@ -27,55 +30,31 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
 	
 	@Autowired
-    private PasswordEncoder passwordEncoder;
-
+	private UserDao userDao;
+	
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(final String username) {
 		log.debug("Authenticating {}", username);
-		if ("user".equals(username)) {
-			return createSpringSecurityUser(new User(username, passwordEncoder.encode("user"), List.of(AuthoritiesConstants.USER)));
-		} else if ("admin".equals(username)) {
-			return createSpringSecurityUser(new User(username, passwordEncoder.encode("admin"), List.of(AuthoritiesConstants.ADMIN)));
-		}
-		throw new UsernameNotFoundException("User " + username + " was not found in the database");
+		return userDao
+	            .findByUsername(username)
+	            .map(this::createSpringSecurityUser)
+	            .orElseThrow(() -> new UsernameNotFoundException("User " + username + " was not found in the database"));
 	}
 
 	private org.springframework.security.core.userdetails.User createSpringSecurityUser(User user) {
-		List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream().map(SimpleGrantedAuthority::new)
+		if(user.isSessionActive()) {
+			throw new SessionExistException("User " + user.getUsername() + " has active session. Please logout before authenticate.");
+		}
+		List<String> roles = new ArrayList<>();
+		if(user.getUsername().equals("admin")) {
+			roles.add(AuthoritiesConstants.ADMIN);
+		} else if(user.getUsername().equals("user")) {
+			roles.add(AuthoritiesConstants.USER);
+		}
+		List<GrantedAuthority> grantedAuthorities = roles.stream().map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
 				grantedAuthorities);
-	}
-
-	/**
-	 * Object to hold user info.
-	 */
-	class User {
-
-		private final String username;
-
-		private final String password;
-
-		private final List<String> authorities;
-
-		public User(String username, String password, List<String> authorities) {
-			super();
-			this.username = username;
-			this.password = password;
-			this.authorities = authorities;
-		}
-
-		public String getUsername() {
-			return username;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public List<String> getAuthorities() {
-			return authorities;
-		}
 	}
 }

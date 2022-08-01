@@ -12,8 +12,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+
+import com.assignment.dao.UserDao;
+import com.assignment.security.SecurityUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -43,13 +47,16 @@ public class TokenProvider {
 
 	private String base64Secret;
 
-	public TokenProvider() {
+	private final UserDao userDao;
+
+	public TokenProvider(UserDao userDao) {
 		// 5 minute
 		this.tokenValidityInMilliseconds = 300000;
 		this.base64Secret = "bXktc2VjcmV0LWtleS13aGljaC1zaG91bGQtYmUtY2hhbmdlZC1pbi1wcm9kdWN0aW9uLWFuZC1iZS1iYXNlNjQtZW5jb2RlZAo=";
 		byte[] keyBytes = Decoders.BASE64.decode(base64Secret);
 		key = Keys.hmacShaKeyFor(keyBytes);
 		jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+		this.userDao = userDao;
 	}
 
 	public String createToken(Authentication authentication) {
@@ -57,8 +64,10 @@ public class TokenProvider {
 				.collect(Collectors.joining(","));
 		long now = (new Date()).getTime();
 		Date validity = new Date(now + this.tokenValidityInMilliseconds);
-		return Jwts.builder().setSubject(authentication.getName()).claim(AUTHORITIES_KEY, authorities)
+		String token = Jwts.builder().setSubject(authentication.getName()).claim(AUTHORITIES_KEY, authorities)
 				.signWith(key, SignatureAlgorithm.HS512).setExpiration(validity).compact();
+		userDao.addToken(authentication.getName(), token);
+		return token;
 	}
 
 	public Authentication getAuthentication(String token) {
@@ -84,6 +93,13 @@ public class TokenProvider {
 			log.error("Token validation error {}", e.getMessage());
 		}
 		return false;
+	}
+
+	public void removeSession() {
+		if(SecurityUtils.getCurrentUserLogin().isPresent()) {
+			userDao.removeToken(SecurityUtils.getCurrentUserLogin().get());
+		}
+		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 
 }

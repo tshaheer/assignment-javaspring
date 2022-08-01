@@ -14,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.assignment.dto.LoginDto;
+import com.assignment.security.AuthoritiesConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -28,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @AutoConfigureMockMvc
 @SpringBootTest
+@WithMockUser(authorities = AuthoritiesConstants.USER)
 class UserJWTControllerIT {
 
 	@Autowired
@@ -57,5 +60,12 @@ class UserJWTControllerIT {
 		mockMvc.perform(post("/v1/authenticate").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(login))).andExpect(status().isUnauthorized())
 				.andExpect(jsonPath("$.id_token").doesNotExist()).andExpect(header().doesNotExist("Authorization"));
+	}
+	
+	@Test
+	@Transactional
+	void testLogout() throws Exception {
+		mockMvc.perform(post("/v1/logout").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
 	}
 }

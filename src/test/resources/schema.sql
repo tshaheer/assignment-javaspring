@@ -1,3 +1,5 @@
+CREATE TABLE user(id int NOT NULL PRIMARY KEY, username varchar, password varchar, token varchar, session_active varchar);
+
 CREATE TABLE ACCOUNT
 (
     id int NOT NULL PRIMARY KEY,
@@ -12,3 +14,4 @@ CREATE TABLE statement
     datefield varchar(255),
     amount varchar(255)
 );
+

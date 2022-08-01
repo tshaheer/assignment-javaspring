@@ -56,9 +56,7 @@ public class StatementServiceImpl implements StatementService {
 	private List<StatementDto> getLastThreeMonthStatements(Long accountId) {
 		LocalDate today = LocalDate.now();
 		LocalDate fromDate = today.minusMonths(3).withDayOfMonth(1);
-		List<Statement> statements = statementDao.findAllByAccountId(accountId);
-		return statements.stream().filter(fromDate != null ? filterByDateBetween(fromDate, today) : s -> true)
-				.map(StatementDto::new).collect(Collectors.toList());
+		return searchByDateRange(accountId, fromDate, today);
 	}
 
 	private List<StatementDto> searchByDateRange(Long accountId, LocalDate fromDate, LocalDate toDate) {
@@ -84,8 +82,8 @@ public class StatementServiceImpl implements StatementService {
 	private Predicate<Statement> filterByAmountBetween(BigDecimal fromAmount, BigDecimal toAmount) {
 		return statement -> {
 			BigDecimal amount = statement.getAmount();
-			return (amount.equals(fromAmount) || amount.compareTo(fromAmount) > 0)
-					&& (amount.equals(toAmount) || amount.compareTo(toAmount) < 0);
+			return (fromAmount.equals(amount) || fromAmount.compareTo(amount) < 0)
+					&& (toAmount.equals(amount) || toAmount.compareTo(amount) > 0);
 		};
 	}
 

@@ -66,28 +66,28 @@ class StatementServiceTests {
 	}
 	
 	@Test
-	void givenAccountIdWithNullSearchParameter_whenStatementSearch_thenReturnLastThreeMonthStatementList() {
+	void givenAccountId_whenStatementSearch_thenReturnLastThreeMonthStatementList() {
 		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
 		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID);
 		assertThat(statementDtos).hasSize(1);
 	}
 
 	@Test
-	void givenAllSearchParametersWithNonExistAccountId_whenStatementSearch_thenReturnEmptyStatementList() {
+	void givenNonExistAccountId_whenStatementSearch_thenReturnEmptyStatementList() {
 		given(statementDao.findAllByAccountId(Long.MAX_VALUE)).willReturn(Collections.emptyList());
 		List<StatementDto> statementDtos = statementService.searchStatements(Long.MAX_VALUE);
 		assertThat(statementDtos).isEmpty();
 	}
 
 	@Test
-	void givenSearchParametersWithoutAmountRange_whenStatementSearch_thenReturnStatementList() {
+	void givenDateRange_whenStatementSearch_thenReturnStatementList() {
 		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
 		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, FROM_DATE, TO_DATE);
 		assertThat(statementDtos).hasSize(5);
 	}
 
 	@Test
-	void givenSearchParametersWithoutDateRange_whenStatementSearch_thenReturnStatementList() {
+	void givenAmountRange_whenStatementSearch_thenReturnStatementList() {
 		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
 		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, FROM_AMOUNT, TO_AMOUNT);
 		assertThat(statementDtos).hasSize(4);
