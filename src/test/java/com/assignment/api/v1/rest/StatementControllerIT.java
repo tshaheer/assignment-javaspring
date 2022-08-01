@@ -15,7 +15,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,8 +27,9 @@ import com.assignment.domain.Account;
 import com.assignment.dto.StatementDto;
 import com.assignment.service.StatementService;
 
-//@WebMvcTest(StatementController.class)
-class StatementControllerTests {
+@SpringBootTest
+@AutoConfigureMockMvc
+class StatementControllerIT {
 
 	private static final Long ACCOUNT_ID = 4L;
 	private static final String FROM_AMOUNT = "256.292396032404";
@@ -65,7 +67,7 @@ class StatementControllerTests {
 		statements.add(statement);
 	}
 
-	//@Test
+	@Test
 	void givenAccountIdAndDateRange_whenSearchStatements_thenReturnStatementDtoList() throws Exception {
 		given(statementService.searchStatements(ACCOUNT_ID, LocalDate.of(2018, 07, 05), LocalDate.of(2020, 11, 15)))
 				.willReturn(statements);
@@ -76,7 +78,7 @@ class StatementControllerTests {
 				.andExpect(jsonPath("$.size()", CoreMatchers.is(statements.size())));
 	}
 
-	//@Test
+	@Test
 	void givenAccountIdAndAmountRange_whenSearchStatements_thenReturnStatementDtoList() throws Exception {
 		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
 				.willReturn(statements);
@@ -87,7 +89,7 @@ class StatementControllerTests {
 				.andExpect(jsonPath("$.size()", CoreMatchers.is(statements.size())));
 	}
 
-	//@Test
+	@Test
 	void givenAccountId_whenSearchStatements_thenReturnLastThreeMonthsStatementDtoList() throws Exception {
 		given(statementService.searchStatements(ACCOUNT_ID)).willReturn(statements);
 		ResultActions response = mockMvc.perform(get(API_URL_STATEMENTS + "/{accountId}", ACCOUNT_ID));

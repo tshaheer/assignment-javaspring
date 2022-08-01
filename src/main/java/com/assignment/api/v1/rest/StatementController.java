@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.assignment.dto.StatementDto;
+import com.assignment.security.AuthoritiesConstants;
 import com.assignment.service.StatementService;
 import com.assignment.util.DateUtil;
 
@@ -34,6 +36,7 @@ public class StatementController {
 	}
 
 	@GetMapping(value = "/{accountId}", params = { "fromDate", "toDate" })
+	@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
 	public List<StatementDto> searchStatements(@PathVariable(value = "accountId") final Long accountId,
 			@RequestParam(value = "fromDate") final String fromDate,
 			@RequestParam(value = "toDate") final String toDate) {
@@ -43,6 +46,7 @@ public class StatementController {
 	}
 
 	@GetMapping(value = "/{accountId}", params = { "fromAmount", "toAmount" })
+	@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
 	public List<StatementDto> searchStatements(@PathVariable(value = "accountId") final Long accountId,
 			@RequestParam(value = "fromAmount") final BigDecimal fromAmount,
 			@RequestParam(value = "toAmount") final BigDecimal toAmount) {
@@ -52,6 +56,7 @@ public class StatementController {
 	}
 
 	@GetMapping(value = "/{accountId}")
+	@PreAuthorize("hasAnyAuthority(\"" + AuthoritiesConstants.ADMIN + "\",\"" + AuthoritiesConstants.USER +"\" )")
 	public List<StatementDto> lastThreeMonthStatements(@PathVariable(value = "accountId") final Long accountId) {
 		log.debug("REST request to get last three month statements for account : accountId: {}", accountId);
 		return statementService.searchStatements(accountId);

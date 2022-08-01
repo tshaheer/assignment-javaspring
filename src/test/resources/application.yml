@@ -1,4 +1,7 @@
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:h2:mem:accountsdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
