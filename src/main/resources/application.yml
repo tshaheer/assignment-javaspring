@@ -1,7 +1,6 @@
 logging:
   level:
-    web: DEBUG
-    sql: DEBUG
+    com.assignment: DEBUG
 
 server:
   port: 8080
