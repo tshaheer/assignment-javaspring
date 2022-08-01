@@ -1,18 +1,10 @@
 package com.assignment.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
+import com.assignment.util.DateUtil;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -21,30 +13,37 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * @author Shaheer
  * @since 30 July 2022
  */
-@Entity
-@Table(name = "statement")
 public class Statement implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-	@SequenceGenerator(name = "sequenceGenerator")
-	@Column(name = "id")
+	
 	private Long id;
 
-	@NotNull
-	@Column(name = "date", nullable = false)
-	private String date;
+	private LocalDate date;
 
-	@NotNull
-	@Column(name = "amount", nullable = false)
-	private String amount;
-	
-	@ManyToOne
+	private BigDecimal amount;
+
 	@JsonIgnoreProperties(value = { "statements" }, allowSetters = true)
-	@JoinColumn(name = "account_id")
 	private Account account;
+
+	public Statement() {
+	}
+	
+	public Statement(Long id, String dateInString, String amountInString, Account account) {
+		super();
+		this.id = id;
+		this.date = DateUtil.convertToDate(dateInString);
+		this.amount = new BigDecimal(amountInString);
+		this.account = account;
+	}
+
+	public Statement(Long id, LocalDate date, BigDecimal amount, Account account) {
+		super();
+		this.id = id;
+		this.date = date;
+		this.amount = amount;
+		this.account = account;
+	}
 
 	public Long getId() {
 		return id;
@@ -54,22 +53,22 @@ public class Statement implements Serializable {
 		this.id = id;
 	}
 
-	public String getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
-	public String getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(String amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
-	
+
 	public Account getAccount() {
 		return account;
 	}

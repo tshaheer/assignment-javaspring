@@ -1,6 +1,7 @@
 package com.assignment.dto;
 
 import com.assignment.domain.Statement;
+import com.assignment.util.DateUtil;
 
 /**
  * A DTO representing a statement, with account information.
@@ -20,12 +21,20 @@ public class StatementDto {
 
 	public StatementDto() {
 	}
+	
+	public StatementDto(String accountNumber, String accountType, String date, String amount) {
+		super();
+		this.accountNumber = accountNumber;
+		this.accountType = accountType;
+		this.date = date;
+		this.amount = amount;
+	}
 
 	public StatementDto(Statement statement) {
 		this.accountNumber = statement.getAccount().getAccountNumber();
-		this.accountType = statement.getAccount().getAccountType().toString();
-		this.date = statement.getDate();
-		this.amount = statement.getAmount();
+		this.accountType = statement.getAccount().getAccountType();
+		this.date = statement.getDate().format(DateUtil.DATE_FORMATTER);
+		this.amount = statement.getAmount().toString();
 	}
 
 	public String getAccountNumber() {
@@ -58,5 +67,11 @@ public class StatementDto {
 
 	public void setAmount(String amount) {
 		this.amount = amount;
+	}
+
+	@Override
+	public String toString() {
+		return "StatementDto [accountNumber=" + accountNumber + ", accountType=" + accountType + ", date=" + date
+				+ ", amount=" + amount + "]";
 	}
 }

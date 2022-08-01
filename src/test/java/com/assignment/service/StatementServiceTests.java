@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,136 +16,80 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.assignment.dao.StatementDao;
 import com.assignment.domain.Account;
 import com.assignment.domain.Statement;
-import com.assignment.domain.enums.AccountType;
 import com.assignment.dto.StatementDto;
-import com.assignment.dto.StatementSearchDto;
-import com.assignment.repository.StatementRepository;
+import com.assignment.service.impl.StatementServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class StatementServiceTests {
-	
+
 	private static final Long ACCOUNT_ID = 4L;
+	private static final LocalDate FROM_DATE = LocalDate.of(2018, 07, 05);
+	private static final LocalDate TO_DATE = LocalDate.of(2020, 11, 15);
+	private static final BigDecimal FROM_AMOUNT = new BigDecimal("257.292396032404");
+	private static final BigDecimal TO_AMOUNT = new BigDecimal("966.410308637791");
 
 	@InjectMocks
-	private StatementService statementService;
+	private StatementServiceImpl statementService;
 
 	@Mock
-	private StatementRepository statementRepository;
-	
-	private StatementSearchDto statementSearchDto;
+	private StatementDao statementDao;
 
 	private List<Statement> statements = new ArrayList<>();
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		Account account = new Account();
 		account.setId(ACCOUNT_ID);
-		account.setAccountType(AccountType.CURRENT);
+		account.setAccountType("current");
 		account.setAccountNumber("0012250016004");
 
-		Statement statement = new Statement();
-		statement.setId(1L);
-		statement.setDate("15.11.2020");
-		statement.setAmount("967.410308637791");
-		statement.setAccount(account);
+		Statement statement = new Statement(1L, "15.11.2020", "967.410308637791", account);
 		statements.add(statement);
 
-		statement = new Statement();
-		statement.setId(2L);
-		statement.setDate("12.03.2020");
-		statement.setAmount("256.292396032404");
-		statement.setAccount(account);
+		statement = new Statement(2L, "12.03.2020", "256.292396032404", account);
 		statements.add(statement);
 
-		statement = new Statement();
-		statement.setId(3L);
-		statement.setDate("22.06.2020");
-		statement.setAmount("386.908121686113");
-		statement.setAccount(account);
+		statement = new Statement(3L, "22.06.2020", "386.908121686113", account);
 		statements.add(statement);
 
-		statement = new Statement();
-		statement.setId(4L);
-		statement.setDate("30.10.2019");
-		statement.setAmount("798.090576128434");
-		statement.setAccount(account);
+		statement = new Statement(4L, "30.10.2019", "798.090576128434", account);
 		statements.add(statement);
 
-		statement = new Statement();
-		statement.setId(5L);
-		statement.setDate("05.07.2018");
-		statement.setAmount("501.921910891848");
-		statement.setAccount(account);
+		statement = new Statement(5L, "05.07.2018", "501.921910891848", account);
 		statements.add(statement);
-		
-		statement = new Statement();
-		statement.setId(6L);
-		statement.setDate("05.07.2022");
-		statement.setAmount("501.921910891848");
-		statement.setAccount(account);
+
+		statement = new Statement(6L, "05.07.2022", "501.921910891848", account);
 		statements.add(statement);
-		
-		statementSearchDto = new StatementSearchDto();
-		statementSearchDto.setFromDate(LocalDate.of(2018, 07, 05));
-		statementSearchDto.setToDate(LocalDate.of(2020, 11, 15));
-		statementSearchDto.setFromAmount(new BigDecimal("257.292396032404"));
-		statementSearchDto.setToAmount(new BigDecimal("966.410308637791"));
 	}
-
+	
 	@Test
-	void givenAllSearchParameters_whenStatementSearch_thenReturnStatementList() {
-		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
-		assertThat(statementDtos).hasSize(3);
+	void givenAccountIdWithNullSearchParameter_whenStatementSearch_thenReturnLastThreeMonthStatementList() {
+		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID);
+		assertThat(statementDtos).hasSize(1);
 	}
 
 	@Test
 	void givenAllSearchParametersWithNonExistAccountId_whenStatementSearch_thenReturnEmptyStatementList() {
-		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchStatements(6L, statementSearchDto);
+		given(statementDao.findAllByAccountId(Long.MAX_VALUE)).willReturn(Collections.emptyList());
+		List<StatementDto> statementDtos = statementService.searchStatements(Long.MAX_VALUE);
 		assertThat(statementDtos).isEmpty();
 	}
-	
+
 	@Test
 	void givenSearchParametersWithoutAmountRange_whenStatementSearch_thenReturnStatementList() {
-		statementSearchDto.setFromAmount(null);
-		statementSearchDto.setToAmount(null);
-		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
+		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, FROM_DATE, TO_DATE);
 		assertThat(statementDtos).hasSize(5);
 	}
-	
+
 	@Test
 	void givenSearchParametersWithoutDateRange_whenStatementSearch_thenReturnStatementList() {
-		statementSearchDto.setFromDate(null);
-		statementSearchDto.setToDate(null);
-		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
+		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, FROM_AMOUNT, TO_AMOUNT);
 		assertThat(statementDtos).hasSize(4);
 	}
-	
-	@Test
-	void givenAccountIdWithoutSearchParameter_whenStatementSearch_thenReturnLastThreeMonthStatementList() {
-		statementSearchDto = null;
-		given(statementRepository.findAll()).willReturn(statements);
-		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, statementSearchDto);
-		assertThat(statementDtos).hasSize(1);
-	}
-	
-//	@Test
-//	void givenSearchParametersWithoutAccountId_whenStatementSearch_thenReturnBadRequest() {
-//		
-//	}
-//	
-//	@Test
-//	void givenSearchParametersWithInvalidDateRange_whenStatementSearch_thenReturnBadRequest() {
-//		
-//	}
-//	
-//	@Test
-//	void givenSearchParametersWithInvalidAmountRange_whenStatementSearch_thenReturnBadRequest() {
-//		
-//	}
 }

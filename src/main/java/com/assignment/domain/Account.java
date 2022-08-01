@@ -1,24 +1,6 @@
 package com.assignment.domain;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.assignment.domain.enums.AccountType;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * An Account.
@@ -26,30 +8,24 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * @author Shaheer
  * @since 30 July 2022
  */
-@Entity
-@Table(name = "account")
 public class Account implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-	@SequenceGenerator(name = "sequenceGenerator")
-	@Column(name = "id")
 	private Long id;
 
-	@NotNull
-	@Column(name = "account_type", nullable = false)
-	@Enumerated(EnumType.STRING)
-	private AccountType accountType;
+	private String accountType;
 
-	@NotNull
-	@Column(name = "account_number", nullable = false)
 	private String accountNumber;
+	
+	public Account() {
+	}
 
-	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-	@JsonIgnoreProperties(value = { "account" }, allowSetters = true)
-	private Set<Statement> statements = new HashSet<>();
+	public Account(Long id, String accountType, String accountNumber) {
+		this.id = id;
+		this.accountType = accountType;
+		this.accountNumber = accountNumber;
+	}
 
 	public Long getId() {
 		return id;
@@ -59,11 +35,11 @@ public class Account implements Serializable {
 		this.id = id;
 	}
 
-	public AccountType getAccountType() {
+	public String getAccountType() {
 		return accountType;
 	}
 
-	public void setAccountType(AccountType accountType) {
+	public void setAccountType(String accountType) {
 		this.accountType = accountType;
 	}
 
@@ -73,26 +49,6 @@ public class Account implements Serializable {
 
 	public void setAccountNumber(String accountNumber) {
 		this.accountNumber = accountNumber;
-	}
-
-	public Set<Statement> getStatements() {
-		return statements;
-	}
-
-	public void setStatements(Set<Statement> statements) {
-		this.statements = statements;
-	}
-
-	public Account addAccount(Statement statement) {
-		this.statements.add(statement);
-		statement.setAccount(this);
-		return this;
-	}
-
-	public Account removeAccount(Statement statement) {
-		this.statements.remove(statement);
-		statement.setAccount(null);
-		return this;
 	}
 
 	@Override
