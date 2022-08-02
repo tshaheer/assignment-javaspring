@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StatementServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assignment-javaspring</a> &gt; <a href="index.source.html" class="el_package">com.assignment.service.impl</a> &gt; <span class="el_source">StatementServiceImpl.java</span></div><h1>StatementServiceImpl.java</h1><pre class="source lang-java linenums">package com.assignment.service.impl;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.assignment.dao.StatementDao;
+import com.assignment.domain.Statement;
+import com.assignment.dto.StatementDto;
+import com.assignment.service.StatementService;
+
+/**
+ * Service class for managing account statements.
+ * 
+ * @author Shaheer
+ * @since 30 July 2022
+ */
+@Service
+@Transactional
+public class StatementServiceImpl implements StatementService {
+<span class="fc" id="L28">	private final Logger log = LoggerFactory.getLogger(StatementServiceImpl.class);</span>
+
+	private final StatementDao statementDao;
+
+<span class="fc" id="L32">	public StatementServiceImpl(StatementDao statementDao) {</span>
+<span class="fc" id="L33">		this.statementDao = statementDao;</span>
+<span class="fc" id="L34">	}</span>
+
+	@Override
+	public List&lt;StatementDto&gt; searchStatements(Long accountId) {
+<span class="fc" id="L38">		log.debug(&quot;Statement search started with accountId {} and without any parameter&quot;, accountId);</span>
+<span class="fc" id="L39">		return getLastThreeMonthStatements(accountId);</span>
+	}
+
+	@Override
+	public List&lt;StatementDto&gt; searchStatements(Long accountId, LocalDate fromDate, LocalDate toDate) {
+<span class="fc" id="L44">		log.debug(&quot;Statement search started with accountId {} and with fromDate {}, toDate {}&quot;, accountId, fromDate,</span>
+				toDate);
+<span class="fc" id="L46">		return searchByDateRange(accountId, fromDate, toDate);</span>
+	}
+
+	@Override
+	public List&lt;StatementDto&gt; searchStatements(Long accountId, BigDecimal fromAmount, BigDecimal toAmount) {
+<span class="fc" id="L51">		log.debug(&quot;Statement search started with accountId {} and with fromAmount {}, toAmount {}&quot;, accountId,</span>
+				fromAmount, toAmount);
+<span class="fc" id="L53">		return searchByAmountRange(accountId, fromAmount, toAmount);</span>
+	}
+
+	private List&lt;StatementDto&gt; getLastThreeMonthStatements(Long accountId) {
+<span class="fc" id="L57">		LocalDate today = LocalDate.now();</span>
+<span class="fc" id="L58">		LocalDate fromDate = today.minusMonths(3).withDayOfMonth(1);</span>
+<span class="fc" id="L59">		return searchByDateRange(accountId, fromDate, today);</span>
+	}
+
+	private List&lt;StatementDto&gt; searchByDateRange(Long accountId, LocalDate fromDate, LocalDate toDate) {
+<span class="fc" id="L63">		List&lt;Statement&gt; statements = statementDao.findAllByAccountId(accountId);</span>
+<span class="fc" id="L64">		return statements.stream().filter(filterByDateBetween(fromDate, toDate)).map(StatementDto::new)</span>
+<span class="fc" id="L65">				.collect(Collectors.toList());</span>
+	}
+
+	private List&lt;StatementDto&gt; searchByAmountRange(Long accountId, BigDecimal fromAmount, BigDecimal toAmount) {
+<span class="fc" id="L69">		List&lt;Statement&gt; statements = statementDao.findAllByAccountId(accountId);</span>
+<span class="fc" id="L70">		return statements.stream().filter(filterByAmountBetween(fromAmount, toAmount)).map(StatementDto::new)</span>
+<span class="fc" id="L71">				.collect(Collectors.toList());</span>
+	}
+
+	private Predicate&lt;Statement&gt; filterByDateBetween(LocalDate fromDate, LocalDate toDate) {
+<span class="fc" id="L75">		return statement -&gt; {</span>
+<span class="fc" id="L76">			LocalDate date = statement.getDate();</span>
+<span class="fc bfc" id="L77" title="All 4 branches covered.">			return (date.isEqual(fromDate) || date.isAfter(fromDate))</span>
+<span class="fc bfc" id="L78" title="All 4 branches covered.">					&amp;&amp; (date.isEqual(toDate) || date.isBefore(toDate));</span>
+		};
+	}
+
+	private Predicate&lt;Statement&gt; filterByAmountBetween(BigDecimal fromAmount, BigDecimal toAmount) {
+<span class="fc" id="L83">		return statement -&gt; {</span>
+<span class="fc" id="L84">			BigDecimal amount = statement.getAmount();</span>
+<span class="fc bfc" id="L85" title="All 4 branches covered.">			return (fromAmount.equals(amount) || fromAmount.compareTo(amount) &lt; 0)</span>
+<span class="fc bfc" id="L86" title="All 4 branches covered.">					&amp;&amp; (toAmount.equals(amount) || toAmount.compareTo(amount) &gt; 0);</span>
+		};
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

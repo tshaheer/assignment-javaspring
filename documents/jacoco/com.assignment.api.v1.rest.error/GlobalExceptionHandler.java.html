@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assignment-javaspring</a> &gt; <a href="index.source.html" class="el_package">com.assignment.api.v1.rest.error</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.assignment.api.v1.rest.error;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+/**
+ * Controller advice to translate the server side exceptions to client-friendly
+ * json structures.
+ * 
+ * @author Shaheer
+ * @since 1 August 2022
+ */
+@ControllerAdvice
+<span class="fc" id="L23">public class GlobalExceptionHandler {</span>
+
+	/**
+	 * Handles StatementSearchException. Created to encapsulate errors in statement
+	 * search.
+	 *
+	 * @param ex the StatementSearchException
+	 * @return the ApiErrorResponse object
+	 */
+	@ExceptionHandler({ StatementSearchException.class })
+	public ResponseEntity&lt;ApiErrorResponse&gt; handleStatementSearchException(final StatementSearchException ex,
+			final WebRequest request) {
+<span class="fc" id="L35">		final List&lt;String&gt; errors = ex.getFieldErrors();</span>
+<span class="fc" id="L36">		final ApiErrorResponse apiError = new ApiErrorResponse(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(),</span>
+				errors);
+<span class="fc" id="L38">		return new ResponseEntity&lt;&gt;(apiError, new HttpHeaders(), apiError.getStatus());</span>
+	}
+
+	@ExceptionHandler({ MethodArgumentTypeMismatchException.class })
+	public ResponseEntity&lt;ApiErrorResponse&gt; handleMethodArgumentTypeMismatch(final MethodArgumentTypeMismatchException ex,
+			final WebRequest request) {
+<span class="fc" id="L44">		Class&lt;?&gt; requiredType = ex.getRequiredType();</span>
+<span class="pc bpc" id="L45" title="1 of 4 branches missed.">		if (requiredType != null &amp;&amp; requiredType.getTypeName().equals(BigDecimal.class.getName())) {</span>
+<span class="fc" id="L46">			final ApiErrorResponse apiError = new ApiErrorResponse(HttpStatus.BAD_REQUEST, &quot;Invalid format&quot;,</span>
+<span class="fc" id="L47">					ex.getName() + &quot; is not a Number&quot;);</span>
+<span class="fc" id="L48">			return new ResponseEntity&lt;&gt;(apiError, new HttpHeaders(), apiError.getStatus());</span>
+		}
+<span class="fc" id="L50">		final String error = ex.getName() + &quot; should be of type &quot; + ex.getRequiredType();</span>
+<span class="fc" id="L51">		final ApiErrorResponse apiError = new ApiErrorResponse(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), error);</span>
+<span class="fc" id="L52">		return new ResponseEntity&lt;&gt;(apiError, new HttpHeaders(), apiError.getStatus());</span>
+	}
+
+	@ExceptionHandler({ AuthenticationException.class })
+	public ResponseEntity&lt;ApiErrorResponse&gt; handleAuthenticationException(final AuthenticationException ex,
+			final WebRequest request) {
+<span class="fc" id="L58">		final ApiErrorResponse apiError = new ApiErrorResponse(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());</span>
+<span class="fc" id="L59">		return new ResponseEntity&lt;&gt;(apiError, new HttpHeaders(), apiError.getStatus());</span>
+	}
+
+	// 500
+
+	@ExceptionHandler({ Exception.class })
+	public ResponseEntity&lt;ApiErrorResponse&gt; handleAll(final Exception ex, final WebRequest request) {
+<span class="fc" id="L66">		final ApiErrorResponse apiError = new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,</span>
+<span class="fc" id="L67">				ex.getLocalizedMessage(), &quot;error occurred&quot;);</span>
+<span class="fc" id="L68">		return new ResponseEntity&lt;&gt;(apiError, new HttpHeaders(), apiError.getStatus());</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

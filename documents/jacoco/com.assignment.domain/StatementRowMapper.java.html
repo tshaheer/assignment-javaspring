@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StatementRowMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assignment-javaspring</a> &gt; <a href="index.source.html" class="el_package">com.assignment.domain</a> &gt; <span class="el_source">StatementRowMapper.java</span></div><h1>StatementRowMapper.java</h1><pre class="source lang-java linenums">package com.assignment.domain;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+/**
+ * Maps a row in the statement table to a Statement object 
+ * 
+ * @author Shaheer
+ * @since 31 July 2022
+ */
+public class StatementRowMapper implements RowMapper&lt;Statement&gt; {
+	
+	private Account account;
+	
+<span class="fc" id="L18">	public StatementRowMapper(Account account) {</span>
+<span class="fc" id="L19">		this.account = account;</span>
+<span class="fc" id="L20">	}</span>
+
+	@Override
+	public Statement mapRow(ResultSet rs, int rowNum) throws SQLException {
+<span class="fc" id="L24">		return new Statement(rs.getLong(&quot;id&quot;), rs.getString(&quot;datefield&quot;), rs.getString(&quot;amount&quot;), this.account);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

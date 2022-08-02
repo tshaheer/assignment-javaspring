@@ -1,0 +1,567 @@
+{
+	"info": {
+		"_postman_id": "79adf2d2-6a6a-4cf2-9160-29a0c19ac95a",
+		"name": "AssignmentJavaApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login-admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/authenticate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login-user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"user\",\r\n    \"password\": \"user\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/authenticate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "date-range",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromDate=05.07.2018&toDate=15.11.2020",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromDate",
+							"value": "05.07.2018"
+						},
+						{
+							"key": "toDate",
+							"value": "15.11.2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "date-range-invalid-format",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromDate=05/07/2018&toDate=15.11.2020",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromDate",
+							"value": "05/07/2018"
+						},
+						{
+							"key": "toDate",
+							"value": "15.11.2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "date-range-fd-gt-td",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromDate=05.07.2021&toDate=15.11.2020",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromDate",
+							"value": "05.07.2021"
+						},
+						{
+							"key": "toDate",
+							"value": "15.11.2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "date-range-td-gt-today",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromDate=05.07.2020&toDate=05.07.2024",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromDate",
+							"value": "05.07.2020"
+						},
+						{
+							"key": "toDate",
+							"value": "05.07.2024"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "amount-range",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromAmount=256.292396032404&toAmount=968.410308637791",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromAmount",
+							"value": "256.292396032404"
+						},
+						{
+							"key": "toAmount",
+							"value": "968.410308637791"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "amount-range-invalid-amount",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromAmount=abc&toAmount=968.410308637791",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromAmount",
+							"value": "abc"
+						},
+						{
+							"key": "toAmount",
+							"value": "968.410308637791"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "amount-range-fa-gt-ta",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromAmount=256.292396032404&toAmount=255.292396032404",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromAmount",
+							"value": "256.292396032404"
+						},
+						{
+							"key": "toAmount",
+							"value": "255.292396032404"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "amount-range-fa-zero",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromAmount=0&toAmount=255.292396032404",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromAmount",
+							"value": "0"
+						},
+						{
+							"key": "toAmount",
+							"value": "255.292396032404"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "amount-range-ta-negative",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4?fromAmount=255.292396032404&toAmount=-1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					],
+					"query": [
+						{
+							"key": "fromAmount",
+							"value": "255.292396032404"
+						},
+						{
+							"key": "toAmount",
+							"value": "-1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "statements-without-params",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "statements-without-accId",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/statements",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"statements"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "auth-token",
+			"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOIiwiZXhwIjoxNjU5NDYyMDYxfQ.bGVdovyIXN-aaf9wr-8n9OpwEblRMW2GyVos9MN4Ygz9pyYyTDZL6ZnoS42oKt-dt3GVM86Rt2BHgE3Ug8JpCA"
+		}
+	]
+}
