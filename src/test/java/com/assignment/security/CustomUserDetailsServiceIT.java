@@ -1,7 +1,6 @@
 package com.assignment.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +34,4 @@ class CustomUserDetailsServiceIT {
 		assertThat(userDetails).isNotNull();
 		assertThat(userDetails.getUsername()).isEqualTo(ADMIN_USERNAME);
 	}
-	
-	@Test
-    void assertThatSessionExistExceptionIsThrownForMultipleLogin() {
-		UserDetails userDetails = customUserDetailsService.loadUserByUsername(ADMIN_USERNAME);
-        assertThatExceptionOfType(SessionExistException.class)
-            .isThrownBy(() -> customUserDetailsService.loadUserByUsername(ADMIN_USERNAME));
-    }
 }

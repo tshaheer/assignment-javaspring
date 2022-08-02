@@ -39,5 +39,19 @@ class UserDaoTests {
 		Optional<User> user = userDao.findByUsername("user1");
 		assertThat(user).isEmpty();
 	}
-
+	
+	@Test
+	void givenUsernameAndToken_whenAddToken_thenUpdateToken() {
+		String username = "user";
+		String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTY1OTQzMTYwMH0.dFqbMRgy1JqklyRIqbVSeRgOk7H4gIAi6ypp8P09jXQgrQMZDcEK38qPRUfy1hW9lgEsGeRIzFI_0gXU9RUONw";
+		userDao.addToken(username, token);
+		assertThat(username).isNotBlank();
+	}
+	
+	@Test
+	void givenUsername_whenRemoveToken_thenRemoveToken() {
+		String username = "user";
+		userDao.removeToken(username);
+		assertThat(username).isNotBlank();
+	}
 }

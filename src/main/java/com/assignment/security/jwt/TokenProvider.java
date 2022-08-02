@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import com.assignment.dao.UserDao;
-import com.assignment.security.SecurityUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -45,15 +44,15 @@ public class TokenProvider {
 
 	private long tokenValidityInMilliseconds;
 
-	private String base64Secret;
+	private String base64Sec;
 
 	private final UserDao userDao;
 
 	public TokenProvider(UserDao userDao) {
 		// 5 minute
 		this.tokenValidityInMilliseconds = 300000;
-		this.base64Secret = "bXktc2VjcmV0LWtleS13aGljaC1zaG91bGQtYmUtY2hhbmdlZC1pbi1wcm9kdWN0aW9uLWFuZC1iZS1iYXNlNjQtZW5jb2RlZAo=";
-		byte[] keyBytes = Decoders.BASE64.decode(base64Secret);
+		this.base64Sec = "bXktc2VjcmV0LWtleS13aGljaC1zaG91bGQtYmUtY2hhbmdlZC1pbi1wcm9kdWN0aW9uLWFuZC1iZS1iYXNlNjQtZW5jb2RlZAo=";
+		byte[] keyBytes = Decoders.BASE64.decode(this.base64Sec);
 		key = Keys.hmacShaKeyFor(keyBytes);
 		jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
 		this.userDao = userDao;
@@ -94,11 +93,18 @@ public class TokenProvider {
 		}
 		return false;
 	}
-
-	public void removeSession() {
-		if(SecurityUtils.getCurrentUserLogin().isPresent()) {
-			userDao.removeToken(SecurityUtils.getCurrentUserLogin().get());
+	
+	public String getUsername(String token) {
+		try {
+			jwtParser.parseClaimsJws(token).getBody();
+		}catch (ExpiredJwtException  e) {
+			return e.getClaims().getSubject();
 		}
+		return null;
+	}
+
+	public void removeSession(String username) {
+		userDao.removeToken(username);
 		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 

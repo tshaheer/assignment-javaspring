@@ -16,7 +16,6 @@ import com.assignment.api.v1.rest.validator.StatementSearchValidator;
 import com.assignment.dto.StatementDto;
 import com.assignment.security.AuthoritiesConstants;
 import com.assignment.service.StatementService;
-import com.assignment.util.DateUtil;
 
 /**
  * REST controller for managing {@link com.assignment.domain.Statement}.
@@ -38,33 +37,35 @@ public class StatementController {
 
 	@GetMapping(value = "/{accountId}", params = { "fromDate", "toDate" })
 	@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-	public List<StatementDto> searchStatements(@PathVariable(value = "accountId") final Long accountId,
+	public List<StatementDto> searchStatements(@PathVariable(value = "accountId") final String accountId,
 			@RequestParam(value = "fromDate") final String fromDate,
 			@RequestParam(value = "toDate") final String toDate) {
 		log.debug("REST request to search statements : accountId: {}, formDate: {}, toDate: {}", accountId, fromDate,
 				toDate);
 		StatementSearchValidator validator = new StatementSearchValidator();
-		validator.validateDates(fromDate, toDate);
-		return statementService.searchStatements(accountId, DateUtil.convertToDate(fromDate), DateUtil.convertToDate(toDate));
+		validator.validateDates(accountId, fromDate, toDate);
+		return statementService.searchStatements(validator.getAccountId(), validator.getFromDate(),validator.getToDate());
 	}
 
 	@GetMapping(value = "/{accountId}", params = { "fromAmount", "toAmount" })
 	@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-	public List<StatementDto> searchStatements(@PathVariable(value = "accountId") final Long accountId,
+	public List<StatementDto> searchStatements(@PathVariable(value = "accountId") final String accountId,
 			@RequestParam(value = "fromAmount") final BigDecimal fromAmount,
 			@RequestParam(value = "toAmount") final BigDecimal toAmount) {
 		log.debug("REST request to search statements : accountId: {}, fromAmount: {}, toAmount: {}", accountId,
 				fromAmount, toAmount);
 		StatementSearchValidator validator = new StatementSearchValidator();
-		validator.validateAmounts(fromAmount, toAmount);
-		return statementService.searchStatements(accountId, fromAmount, toAmount);
+		validator.validateAmounts(accountId, fromAmount, toAmount);
+		return statementService.searchStatements(validator.getAccountId(), fromAmount, toAmount);
 	}
 
 	@GetMapping(value = "/{accountId}")
 	@PreAuthorize("hasAnyAuthority(\"" + AuthoritiesConstants.ADMIN + "\",\"" + AuthoritiesConstants.USER +"\" )")
-	public List<StatementDto> lastThreeMonthStatements(@PathVariable(value = "accountId") final Long accountId) {
+	public List<StatementDto> searchStatements(@PathVariable(value = "accountId") final String accountId) {
 		log.debug("REST request to get last three month statements for account : accountId: {}", accountId);
-		return statementService.searchStatements(accountId);
+		StatementSearchValidator validator = new StatementSearchValidator();
+		validator.validateAccountId(accountId);
+		return statementService.searchStatements(validator.getAccountId());
 	}
 
 }

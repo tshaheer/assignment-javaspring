@@ -35,9 +35,15 @@ class StatementDaoTests {
 	}
 
 	@Test
-	void givenStatements_whenFindAll_thenStatementList() {
+	void givenAccountId_whenFindAll_thenReturnStatementList() {
 		List<Statement> statements = statementDao.findAllByAccountId(1L);
 		assertThat(statements).hasSize(1);
+	}
+	
+	@Test
+	void givenNonExistAccountId_whenFindAll_thenReturnEmptyList() {
+		List<Statement> statements = statementDao.findAllByAccountId(Long.MAX_VALUE);
+		assertThat(statements).isEmpty();
 	}
 
 }

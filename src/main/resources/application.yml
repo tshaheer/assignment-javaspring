@@ -13,7 +13,7 @@ spring:
       matching-strategy: ant-path-matcher
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:ucanaccess://C:/assignment/accountsdb.accdb;openExclusive=false;ignoreCase=true;showSchema=true
+    url: jdbc:ucanaccess://src/main/resources/db/accountsdb.accdb;openExclusive=false;ignoreCase=true;showSchema=true
     driver-class-name: net.ucanaccess.jdbc.UcanaccessDriver
     username:
     password:

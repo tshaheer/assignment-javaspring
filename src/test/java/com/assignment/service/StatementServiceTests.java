@@ -85,6 +85,13 @@ class StatementServiceTests {
 		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, FROM_DATE, TO_DATE);
 		assertThat(statementDtos).hasSize(5);
 	}
+	
+	@Test
+	void givenDateRangeEqual_whenStatementSearch_thenReturnStatementList() {
+		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, LocalDate.of(2018, 07, 05), LocalDate.of(2018, 07, 05));
+		assertThat(statementDtos).hasSize(1);
+	}
 
 	@Test
 	void givenAmountRange_whenStatementSearch_thenReturnStatementList() {
@@ -92,4 +99,13 @@ class StatementServiceTests {
 		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, FROM_AMOUNT, TO_AMOUNT);
 		assertThat(statementDtos).hasSize(4);
 	}
+	
+	@Test
+	void givenAmountRangeEqual_whenStatementSearch_thenReturnStatementList() {
+		given(statementDao.findAllByAccountId(ACCOUNT_ID)).willReturn(statements);
+		List<StatementDto> statementDtos = statementService.searchStatements(ACCOUNT_ID, new BigDecimal("386.908121686113"), new BigDecimal("386.908121686113"));
+		assertThat(statementDtos).hasSize(1);
+	}
+	
+	
 }

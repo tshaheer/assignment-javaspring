@@ -13,8 +13,11 @@ public class StatementSearchValidator {
 	private LocalDate fromDate;
 
 	private LocalDate toDate;
+	
+	private Long accountId;
 
-	public void validateDates(String fDate, String tDate) {
+	public void validateDates(String accountId, String fDate, String tDate) {
+		validateAccountId(accountId);
 		validateDateFormat(fDate, tDate);
 		LocalDate today = LocalDate.now();
 		if (fromDate.isAfter(today)) {
@@ -31,25 +34,54 @@ public class StatementSearchValidator {
 		}
 	}
 
-	public void validateAmounts(BigDecimal fAmt, BigDecimal tAmt) {
-		if (fAmt.signum() <= 0) {
-			throw new StatementSearchException("Value should be greater than zero", List.of("fromAmount should be greater than zero"));
-		}
-		if (tAmt.signum() <= 0) {
-			throw new StatementSearchException("Value should be greater than zero", List.of("toAmount should be greater than zero"));
-		}
-		if (fAmt.compareTo(tAmt) > 0) {
-			throw new StatementSearchException("fromAmount should be less than toAmount", List.of("fromAmount should be less than toAmount"));
-		}
-	}
-
 	private void validateDateFormat(String fDate, String tDate) {
 		try {
-			fromDate = DateUtil.convertToDate(fDate);
-			toDate = DateUtil.convertToDate(tDate);
+			this.fromDate = DateUtil.convertToDate(fDate);
+			this.toDate = DateUtil.convertToDate(tDate);
 		} catch (DateTimeParseException e) {
 			throw new StatementSearchException("Invalid date format. Valid date format is dd.MM.yyyy", e,
 					List.of("Invalid date format. Valid date format is dd.MM.yyyy"));
 		}
+	}
+
+	public void validateAccountId(String accId) {
+		try {
+			this.accountId = Long.parseLong(accId);
+			if(this.accountId <= 0) {
+				throw new StatementSearchException("Should be greater than zero",
+						List.of("accountId should be greater than zero"));
+			}
+		} catch (NumberFormatException nfe) {
+			throw new StatementSearchException("Should be a number",
+					List.of("accountId should be a number"));
+		}
+	}
+
+	public void validateAmounts(String accountId, BigDecimal fAmt, BigDecimal tAmt) {
+		validateAccountId(accountId);
+		if (fAmt.signum() <= 0) {
+			throw new StatementSearchException("Value should be greater than zero",
+					List.of("fromAmount should be greater than zero"));
+		}
+		if (tAmt.signum() <= 0) {
+			throw new StatementSearchException("Value should be greater than zero",
+					List.of("toAmount should be greater than zero"));
+		}
+		if (fAmt.compareTo(tAmt) > 0) {
+			throw new StatementSearchException("fromAmount should be less than toAmount",
+					List.of("fromAmount should be less than toAmount"));
+		}
+	}
+
+	public LocalDate getFromDate() {
+		return fromDate;
+	}
+
+	public LocalDate getToDate() {
+		return toDate;
+	}
+	
+	public Long getAccountId() {
+		return accountId;
 	}
 }

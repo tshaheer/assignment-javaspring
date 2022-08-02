@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,8 +52,8 @@ public class UserJWTController {
 	}
 	
 	@PostMapping("/logout")
-	public ResponseEntity<String> logout() {
-		this.tokenProvider.removeSession();
+	public ResponseEntity<String> logout(@RequestAttribute("username") String username) {
+		this.tokenProvider.removeSession(username);
 		return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
 	}
 

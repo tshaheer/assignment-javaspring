@@ -38,6 +38,10 @@ public class JWTFilter extends GenericFilterBean {
 		if (StringUtils.hasText(jwt) && this.tokenProvider.validateToken(jwt)) {
 			Authentication authentication = this.tokenProvider.getAuthentication(jwt);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
+		} else {
+			if(httpServletRequest.getRequestURL().toString().endsWith("/api/v1/logout")){
+				httpServletRequest.setAttribute("username", this.tokenProvider.getUsername(jwt));
+			}
 		}
 		filterChain.doFilter(servletRequest, servletResponse);
 	}

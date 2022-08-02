@@ -46,29 +46,13 @@ public class ApiErrorResponse implements Serializable {
 	public HttpStatus getStatus() {
 		return status;
 	}
-
-	public void setStatus(HttpStatus status) {
-		this.status = status;
-	}
-
+	
 	public String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	@Override
+	public String toString() {
+		return "ApiErrorResponse [status=" + status + ", message=" + message + ", errors=" + errors + "]";
 	}
-
-	public List<String> getErrors() {
-		return errors;
-	}
-
-	public void setErrors(List<String> errors) {
-		this.errors = errors;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-    
 }

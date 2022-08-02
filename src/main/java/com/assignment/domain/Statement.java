@@ -36,15 +36,7 @@ public class Statement implements Serializable {
 		this.amount = new BigDecimal(amountInString);
 		this.account = account;
 	}
-
-	public Statement(Long id, LocalDate date, BigDecimal amount, Account account) {
-		super();
-		this.id = id;
-		this.date = date;
-		this.amount = amount;
-		this.account = account;
-	}
-
+	
 	public Long getId() {
 		return id;
 	}

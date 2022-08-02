@@ -153,15 +153,6 @@ class StatementControllerIT {
 				API_URL_STATEMENTS + "/{accountId}?fromAmount="+ FROM_AMOUNT +"&toAmount=xyz", ACCOUNT_ID));
 		response.andExpect(status().isBadRequest());
 	}
-	
-	@Test
-	void givenAccountIdAndFromAmountLessThanZero_whenSearchStatements_thenReturnBadRequest() throws Exception {
-		given(statementService.searchStatements(ACCOUNT_ID, new BigDecimal(FROM_AMOUNT), new BigDecimal(TO_AMOUNT)))
-				.willReturn(statements);
-		ResultActions response = mockMvc.perform(get(
-				API_URL_STATEMENTS + "/{accountId}?fromAmount=-1&toAmount=12", ACCOUNT_ID));
-		response.andExpect(status().isBadRequest());
-	}
 
 	@Test
 	void givenAccountIdAndToAmountZero_whenSearchStatements_thenReturnBadRequest() throws Exception {

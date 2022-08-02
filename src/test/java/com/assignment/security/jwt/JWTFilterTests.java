@@ -112,4 +112,17 @@ class JWTFilterTests {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
+    
+    @Test
+    void givenExpiredTokenLogoutUrl_whenTestJWTFilter_thenLogout() throws Exception {
+        String jwt = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTY1OTQzMTYwMH0.dFqbMRgy1JqklyRIqbVSeRgOk7H4gIAi6ypp8P09jXQgrQMZDcEK38qPRUfy1hW9lgEsGeRIzFI_0gXU9RUONw";
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        request.setRequestURI("/api/v1/logout");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain filterChain = new MockFilterChain();
+        jwtFilter.doFilter(request, response, filterChain);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
 }

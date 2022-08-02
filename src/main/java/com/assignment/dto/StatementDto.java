@@ -50,32 +50,16 @@ public class StatementDto {
 		return accountNumber;
 	}
 
-	public void setAccountNumber(String accountNumber) {
-		this.accountNumber = accountNumber;
-	}
-
 	public String getAccountType() {
 		return accountType;
-	}
-
-	public void setAccountType(String accountType) {
-		this.accountType = accountType;
 	}
 
 	public String getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
-		this.date = date;
-	}
-
 	public String getAmount() {
 		return amount;
-	}
-
-	public void setAmount(String amount) {
-		this.amount = amount;
 	}
 
 	@Override
