@@ -1,10 +1,22 @@
 
 ## Running the server locally
-The application can be started using the following command -
+
+First clone the source code form this repository to your workspace folder. 
+
+`````
+	$ git clone https://github.com/tshaheer/assignment-javaspring
+`````
+
+Navigate to the root folder of the application 'cd assignment-javaspring'
+
+Then the application can be started using the following command
 
 ``````````
 	mvnw
 ``````````
+
+Before running above command clone the source code to 
+
 
 ## Manual Testing the application
 
