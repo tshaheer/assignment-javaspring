@@ -50,6 +50,10 @@ public class ApiErrorResponse implements Serializable {
 	public String getMessage() {
 		return message;
 	}
+	
+	public List<String> getErrors() {
+		return errors;
+	}
 
 	@Override
 	public String toString() {
