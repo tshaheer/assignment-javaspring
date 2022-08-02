@@ -40,5 +40,5 @@ The sonar report for this project can be generated using the following maven com
 
 Start the sonarqube server before running the above maven command.
 
-As an alternative you can use Docker to run the sonar server.The project has a docker-compose file for the quick sonarqube server setup which is located in [docker/sonar.yml](docker/sonar.yml)
+As an alternative you can use Docker to run the sonar server. The project has a docker-compose file for the quick sonarqube server setup which is located in [docker/sonar.yml](docker/sonar.yml)
 
